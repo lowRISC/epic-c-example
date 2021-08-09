@@ -18,13 +18,15 @@ The example runs in spike (riscv-isa-sim) and simulates a system with both SRAM 
 
 ## Building and Running
 
-Use `make` to build and run everything.
-
 Build requirements:
 
 - spike (riscv-isa-sim)
 - xxd
 - LLVM build dependencies
+
+The dependencies may be built and installed manually or the provided [Dockerfile](Dockerfile) can be used to set up a container with the dependencies pre-installed.
+
+Use `make` to build and run everything.
 
 The Clang/LLVM toolchain with ePIC support is automatically built as part of this example.
 
