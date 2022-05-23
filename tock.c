@@ -9,48 +9,49 @@
 struct hdr {
   //  0: Offset of GOT symbols in flash from the start of the application
   //     binary.
-  uint32_t got_sym_start;
+  size_t got_sym_start;
   //  4: Offset of where the GOT section needs to be placed in memory from the
   //     start of the application's memory region.
-  uint32_t got_start;
+  size_t got_start;
   //  8: Size of GOT section.
-  uint32_t got_size;
+  size_t got_size;
   // 12: Offset of data symbols in flash from the start of the application
   //     binary.
-  uint32_t data_sym_start;
+  size_t data_sym_start;
   // 16: Offset of where the data section needs to be placed in memory from the
   //     start of the application's memory region.
-  uint32_t data_start;
+  size_t data_start;
   // 20: Size of data section.
-  uint32_t data_size;
+  size_t data_size;
   // 24: Offset of where the BSS section needs to be placed in memory from the
   //     start of the application's memory region.
-  uint32_t bss_start;
+  size_t bss_start;
   // 28: Size of BSS section.
-  uint32_t bss_size;
+  size_t bss_size;
   // 32: First address offset after program flash, where elf2tab places
   //     .rel.data section
-  uint32_t reldata_start;
+  size_t reldata_start;
   // 36: The size of the stack requested by this application.
-  uint32_t stack_size;
+  size_t stack_size;
 };
 
-void load_from_flash(uint32_t app_start, uint32_t mem_start,
+void load_from_flash(size_t app_start, size_t mem_start,
                      struct reldata *rel_data) {
   struct hdr* myhdr = (struct hdr*)app_start;
 
   // Fix up the Global Offset Table (GOT).
 
   // Get the address in memory of where the table should go.
-  uint32_t* got_start = (uint32_t*)(myhdr->got_start + mem_start);
+  size_t* got_start = (size_t*)(myhdr->got_start + mem_start);
   // Get the address in flash of where the table currently is.
-  uint32_t* got_sym_start = (uint32_t*)(myhdr->got_sym_start + app_start);
+  size_t* got_sym_start = (size_t*)(myhdr->got_sym_start + app_start);
+
   // Iterate all entries in the table and correct the addresses.
-  for (uint32_t i = 0; i < (myhdr->got_size / (uint32_t)sizeof(uint32_t)); i++) {
+  for (size_t i = 0; i < (myhdr->got_size / (size_t)sizeof(size_t)); i++) {
     // Use the sentinel here. If the most significant bit is 0, then we know
     // this offset is pointing to an address in memory. If the MSB is 1, then
     // the offset refers to a value in flash.
-    if ((got_sym_start[i] & 0x80000000) == 0) {
+    if ((got_sym_start[i] & SENTINEL) == 0) {
       // This is an address for something in memory, and we need to correct the
       // address now that we know where this app is actually running in memory.
       // This equation is really:
@@ -65,7 +66,7 @@ void load_from_flash(uint32_t app_start, uint32_t mem_start,
       // where the app has actually been loaded, we can reference from the
       // actual `app_start` address. We also have to remove our fake flash
       // address sentinel (by ORing with 0x80000000).
-      got_start[i] = (got_sym_start[i] ^ 0x80000000) + app_start;
+      got_start[i] = (got_sym_start[i] ^ SENTINEL) + app_start;
     }
   }
 
@@ -89,12 +90,12 @@ void load_from_flash(uint32_t app_start, uint32_t mem_start,
   // data in the kernel's memory (passed as an additional argument).
   struct reldata* rd = rel_data;
 #endif
-  for (uint32_t i = 0; i < (rd->len / (int)sizeof(uint32_t)); i += 3) {
+  for (size_t i = 0; i < (rd->len / (int)sizeof(size_t)); i += 3) {
     // The entries are offsets from the beginning of the app's memory region.
     // First, we get a pointer to the location of the address we need to fix.
-    uint32_t* target = (uint32_t*)(rd->data[i] + mem_start);
-    uint32_t addend = rd->data[i+2];
-    if ((*target & 0x80000000) == 0) {
+    size_t* target = (size_t*)(rd->data[i] + mem_start);
+    size_t addend = rd->data[i+2];
+    if ((*target & SENTINEL) == 0) {
       // Again, we use our sentinel. If the address at that location has a MSB
       // of 0, then we know this is an address in RAM. We need to fix the
       // address by including the offset where the app actual ended up in
@@ -105,7 +106,7 @@ void load_from_flash(uint32_t app_start, uint32_t mem_start,
       // When the MSB is 1, the address is in flash. We clear our sentinel, and
       // then make the address an offset from the start of where the app is
       // located in flash.
-      *target = (*target ^ 0x80000000) + app_start;
+      *target = (*target ^ SENTINEL) + app_start;
     }
   }
 }

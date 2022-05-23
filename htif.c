@@ -7,12 +7,9 @@
 #ifdef KERNEL
 volatile uint64_t tohost __attribute__((section(".htif")));
 volatile uint64_t fromhost __attribute__((section(".htif")));
-#define TOHOST   tohost
-#define FROMHOST fromhost
-#else
+#endif
 #define TOHOST   (*(volatile uint64_t*)0x0002000)
 #define FROMHOST (*(volatile uint64_t*)0x0002008)
-#endif
 
 uintptr_t syscall(uintptr_t n, uintptr_t a0, uintptr_t a1, uintptr_t a2,
                   uintptr_t a3, uintptr_t a4, uintptr_t a5, uintptr_t a6)

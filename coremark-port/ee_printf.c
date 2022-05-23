@@ -661,7 +661,7 @@ ee_vsprintf(char *buf, const char *fmt, va_list args)
 
 #include "htif.h"
 
-unsigned int strlen(const char* str) {
+size_t strlen(const char* str) {
     long i = 0;
     while(str[i] != 0)
         ++i;
@@ -687,6 +687,6 @@ ee_printf(const char *fmt, ...)
     va_end(args);
     p = buf;
     uint32_t len = strlen(p);
-    syscall(SYS_write, 0, (uint32_t)p, len, 0, 0, 0, 0);
+    syscall(SYS_write, 0, (size_t)p, len, 0, 0, 0, 0);
     return len;
 }

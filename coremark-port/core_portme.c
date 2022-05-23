@@ -151,7 +151,7 @@ portable_fini(core_portable *p)
     p->portable_id = 0;
 }
 
-void *memset(void *s, int c, unsigned n) {
+void *memset(void *s, int c, size_t n) {
     for(unsigned i = 0; i < n; ++i) {
         ((char*)s)[i] = 0;
     }

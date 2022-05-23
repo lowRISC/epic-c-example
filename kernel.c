@@ -17,13 +17,13 @@ int start() {
     // address range has been made available in spike. The first two pages
     // (0 - 0x2000) are reserved by spike and the third page contains the
     // host-target interface symbols defined in the kernel (0x2000, 0x2008).
-    uint32_t sram_addr = 0x12340000;
-    uint32_t flash_addr = 0x81234000;
+    size_t sram_addr = 0x12340000;
+    size_t flash_addr = 0x81234000;
 
     const void* elf_data = cm; // App to load.
 
     // Simulate programming "Flash" with an app's ELF file contents.
-    uint32_t entry = program_flash_with_elf(elf_data, flash_addr - SENTINEL);
+    size_t entry = program_flash_with_elf(elf_data, flash_addr - SENTINEL);
     if (entry == 0) {
         print("Failed to load app\n");
         return 1;
@@ -34,7 +34,7 @@ int start() {
     // assume that only one relocation section is needed (.rela.data).
     rela_section_info rela_info = rela_section(elf_data, 0);
     if (rela_info.offset == 0) {
-        print("Failed find relocation section\n");
+        print("Failed to find relocation section\n");
         return 1;
     }
 
