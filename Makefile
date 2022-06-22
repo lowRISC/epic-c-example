@@ -28,7 +28,7 @@ kernel: $(CLANG) Makefile kernel.lds init.S kernel.c cm.h htif.c htif.h elf.c el
 	$(CLANG) $(KERNEL_CFLAGS) -c elf.c
 	$(CLANG) $(KERNEL_CFLAGS) -c tock.c
 	$(CLANG) $(KERNEL_CFLAGS) -c util.c
-	$(CLANG) --target=riscv32 -fuse-ld=$(LLVM)/bin/ld.lld -nostdlib -static -mno-relax -Wl,--emit-relocs,-T,kernel.lds -o kernel init.o kernel.o htif.o elf.o tock.o util.o
+	$(CLANG) --target=riscv32 -fuse-ld=$(LLVM)/bin/ld.lld -nostdlib -static -mno-relax -Wl,-T,kernel.lds -o kernel init.o kernel.o htif.o elf.o tock.o util.o
 
 coremark:
 	git clone https://github.com/eembc/coremark.git
