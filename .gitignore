@@ -1,5 +1,7 @@
+/.vscode
 /*.o
 /kernel
 /coremark
 /cm
 /cm.h
+/llvm-project
