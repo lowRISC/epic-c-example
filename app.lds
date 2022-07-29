@@ -19,9 +19,6 @@ SECTIONS
          * Populate the header expected by `crt0`:
          *
          *  struct hdr {
-         *    uint32_t got_sym_start;
-         *    uint32_t got_start;
-         *    uint32_t got_size;
          *    uint32_t data_sym_start;
          *    uint32_t data_start;
          *    uint32_t data_size;
@@ -31,14 +28,6 @@ SECTIONS
          *    uint32_t stack_size;
          *  };
          */
-        /* Offset of GOT symbols in flash from the start of the application
-         * binary. */
-        LONG(LOADADDR(.got) - ORIGIN(FLASH));
-        /* Offset of where the GOT section will be placed in memory from the
-         * beginning of the app's assigned memory. */
-        LONG(_got - ORIGIN(SRAM));
-        /* Size of GOT section. */
-        LONG(SIZEOF(.got));
         /* Offset of data symbols in flash from the start of the application
          * binary. */
         LONG(LOADADDR(.data) - ORIGIN(FLASH));
@@ -104,15 +93,6 @@ SECTIONS
         . = _stack + STACK_SIZE;
         . = ALIGN(16);
     } > SRAM
-
-    .got :
-    {
-        . = ALIGN(4);
-        _got = .;
-        *(.got*)
-        *(.got.plt*)
-        . = ALIGN(128);
-    } > SRAM AT > FLASH
 
     . = ALIGN(2048);
     .data ALIGN(2048):

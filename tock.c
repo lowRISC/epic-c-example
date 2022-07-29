@@ -7,31 +7,22 @@
 #include "util.h"
 
 struct hdr {
-  //  0: Offset of GOT symbols in flash from the start of the application
-  //     binary.
-  size_t got_sym_start;
-  //  4: Offset of where the GOT section needs to be placed in memory from the
-  //     start of the application's memory region.
-  size_t got_start;
-  //  8: Size of GOT section.
-  size_t got_size;
-  // 12: Offset of data symbols in flash from the start of the application
-  //     binary.
+  // Offset of data symbols in flash from the start of the application binary.
   size_t data_sym_start;
-  // 16: Offset of where the data section needs to be placed in memory from the
-  //     start of the application's memory region.
+  // Offset of where the data section needs to be placed in memory from the
+  // start of the application's memory region.
   size_t data_start;
-  // 20: Size of data section.
+  // Size of data section.
   size_t data_size;
-  // 24: Offset of where the BSS section needs to be placed in memory from the
-  //     start of the application's memory region.
+  // Offset of where the BSS section needs to be placed in memory from the start
+  // of the application's memory region.
   size_t bss_start;
-  // 28: Size of BSS section.
+  // Size of BSS section.
   size_t bss_size;
-  // 32: First address offset after program flash, where elf2tab places
-  //     .rel.data section
+  // First address offset after program flash, where elf2tab places the
+  // .rel.data section
   size_t reldata_start;
-  // 36: The size of the stack requested by this application.
+  // The size of the stack requested by this application.
   size_t stack_size;
 };
 
