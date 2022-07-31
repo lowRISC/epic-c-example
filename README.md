@@ -2,7 +2,7 @@
 
 ## Overview
 
-lowRISC is working on a specification and [prototype toolchain implementation](https://github.com/lowRISC/llvm-project/commits/epic) of an Embedded PIC (ePIC) ABI for RISC-V.
+lowRISC is working on a [specification](https://github.com/luismarques/epic-spec) and [prototype toolchain implementation](https://github.com/lowRISC/llvm-project/commits/epic) of an Embedded PIC (ePIC) ABI for RISC-V.
 
 This repository showcases how to use the work-in-progress ePIC toolchain implementation. It contains an example of how to create fully relocatable RISC-V apps that require only a simple runtime loader. To demonstrate the relocatability, the repository also contains a simple kernel that loads and relocates the example app.
 
