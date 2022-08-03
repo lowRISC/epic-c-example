@@ -26,6 +26,6 @@ static unsigned strlen(const char* str) {
     return i;
 }
 
-void print(char *s) {
+void print(const char *s) {
     syscall(SYS_write, 0, (uintptr_t)s, (uintptr_t)strlen(s), 0, 0, 0, 0);
 }
