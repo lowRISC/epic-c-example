@@ -48,7 +48,7 @@ int start() {
     // Set the GP register (the PIC base) to the app's SRAM base address.
     // This is needed every time control is transfered to a different
     // relocatable app.
-    asm volatile("li gp, %0" :: "g"(sram_addr));
+    asm volatile("mv gp, %0" :: "r"(sram_addr));
 
     // Transfer control to the app we loaded.
     ((int(*)())entry)();
