@@ -116,6 +116,7 @@ typedef struct {
 
 #define PT_LOAD 1
 #define SHT_RELA 4
+#define SHF_ALLOC 2
 
 static int check_elf(const void *data) {
     // Check alignment
@@ -164,6 +165,19 @@ static const char *get_str(const void *data, uint32_t str_idx) {
     return data + sh[eh->e_shstrndx].sh_offset + str_idx;
 }
 
+static int get_section_named(const void *data, const char *name) {
+    const Elf_Ehdr *eh = data;
+    const Elf_Shdr* sh = data + eh->e_shoff;
+
+    for(int i = 1; i < eh->e_sh_num-1; i++) {
+        const char *sec_name = get_str(data, sh[i].sh_name);
+        if (strcmp(name, sec_name) == 0)
+            return i;
+    }
+
+    return 0;
+}
+
 rela_section_info rela_section(const void *data, int skip_sections) {
     if (!check_elf(data))
         return (rela_section_info){0, 0};
@@ -177,6 +191,12 @@ rela_section_info rela_section(const void *data, int skip_sections) {
 
             // We don't apply relocations in Flash (e.g. .rela.text)
             if(rela->r_offset & SENTINEL)
+                continue;
+
+            // Don't return relocation sections for unallocatable sections
+            const char *name = get_str(data, sh[i].sh_name);
+            int relocated_sec = get_section_named(data, name + 5);
+            if(!(sh[relocated_sec].sh_flags & SHF_ALLOC))
                 continue;
 
             return (rela_section_info){sh[i].sh_size, sh[i].sh_offset};
