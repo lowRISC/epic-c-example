@@ -158,6 +158,12 @@ size_t program_flash_with_elf(const void *data, size_t flash_offset) {
     return eh->e_entry + flash_offset;
 }
 
+static const char *get_str(const void *data, uint32_t str_idx) {
+    const Elf_Ehdr *eh = data;
+    const Elf_Shdr *sh = data + eh->e_shoff;
+    return data + sh[eh->e_shstrndx].sh_offset + str_idx;
+}
+
 rela_section_info rela_section(const void *data, int skip_sections) {
     if (!check_elf(data))
         return (rela_section_info){0, 0};
