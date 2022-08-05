@@ -1,7 +1,5 @@
 OUTPUT_ARCH( "riscv" )
 
-ENTRY( reset_vector )
-
 SECTIONS
 {
     . = 0x2000;

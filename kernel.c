@@ -10,7 +10,7 @@
 __attribute__ ((aligned(8))) const
 #include "cm.h"
 
-int start() {
+int main() {
     // Arbitrary SRAM and Flash app addresses.
     // You can change these to relocate the loadable app. Just be sure you
     // don't collide with the kernel (0x80000000-~0x80010000) and that the

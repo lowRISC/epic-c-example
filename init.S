@@ -3,17 +3,19 @@
     .skip (1 << 12)
 stack_top:
 
-    .section .text.init,"ax",@progbits
-trap_vector:
-    #li a0, 125
-    #j shutdown
-    mret
+.section .text.init,"ax",@progbits
+.global _start
 
-.global reset_vector
-.global start
+_start:
+    la t0, trap_handler
+    csrw mtvec, t0
 
-reset_vector:
     la sp, stack_top
     li gp, 0
-    call start
+    call main
     j shutdown
+
+trap_handler:
+    li a0, 1
+    j shutdown
+    j trap_handler
