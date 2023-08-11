@@ -7,12 +7,22 @@ RAM_LENGTH  = 0x00010000; /* 64 KB */
 STACK_SIZE  = 0x00001000;
 
 MEMORY {
-    FLASH (rx) : ORIGIN = 0x80000000, LENGTH = PROG_LENGTH
+    FLASH (RX) : ORIGIN = 0x80000000, LENGTH = PROG_LENGTH
     SRAM (RWX) : ORIGIN = 0x00000000, LENGTH = RAM_LENGTH
 }
 
 SECTIONS
 {
+    /* Discard allocatable sections we don't need */
+    /DISCARD/ :
+    {
+        *(.dynsym)
+        *(.gnu.hash)
+        *(.hash)
+        *(.dynstr)
+        *(.dynamic)
+    }
+
     .crt0_header :
     {
         /**
@@ -41,13 +51,19 @@ SECTIONS
         LONG(_fbss - ORIGIN(SRAM));
         /* Size of BSS section */
         LONG(SIZEOF(.bss));
-        /* First address offset after program flash, where elf2tab places
-         * .rel.data section */
-        LONG(LOADADDR(.endflash) - ORIGIN(FLASH));
+        /* Address offset of .rela.dyn section */
+        LONG(LOADADDR(.rela.dyn) - ORIGIN(FLASH));
+        /* Size of .rela.dyn section */
+        LONG(SIZEOF(.rela.dyn));
         /* The size of the stack requested by this application */
         LONG(STACK_SIZE);
         LONG(128);
     } > FLASH =0xFF
+
+    .rela.dyn :
+    {
+        *(.rela.dyn)
+    } > FLASH
 
     .text :
     {

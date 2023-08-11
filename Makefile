@@ -17,7 +17,7 @@ run: kernel
 	$(SPIKE) --isa=$(ISA) -m0x00002000:0xFFFE000,0x10000000:0x70000000,0x80000000:0x80000000 kernel
 
 $(CLANG):
-	git clone -b epic --depth=1 https://github.com/lowRISC/llvm-project.git
+	git clone -b ot-llvm-16-hardening --depth=1 https://github.com/lowRISC/llvm-project.git
 	mkdir llvm-project/build
 	cd llvm-project/build && cmake ../llvm -G Ninja -DCMAKE_BUILD_TYPE="Debug" -DBUILD_SHARED_LIBS=True -DLLVM_USE_SPLIT_DWARF=True -DLLVM_BUILD_TESTS=False -DCMAKE_C_COMPILER=clang -DCMAKE_CXX_COMPILER=clang++ -DLLVM_ENABLE_LLD=True -DLLVM_APPEND_VC_REV=False -DLLVM_TARGETS_TO_BUILD="RISCV" -DLLVM_ENABLE_PROJECTS="clang;lld" && ninja
 
@@ -43,7 +43,7 @@ cm: $(CLANG) Makefile coremark app.lds htif.c htif.h coremark-port/core_portme.c
 	$(CLANG) $(CM_CFLAGS) -c coremark/core_matrix.c
 	$(CLANG) $(CM_CFLAGS) -c coremark/core_state.c
 	$(CLANG) $(CM_CFLAGS) -c coremark/core_util.c
-	$(CLANG) --target=riscv32 -fuse-ld=$(LLVM)/bin/ld.lld -nostdlib -static -Wl,--emit-relocs,-T,app.lds -o cm htif_epic.o core_portme.o cvt.o ee_printf.o core_list_join.o core_main.o core_matrix.o core_state.o core_util.o
+	$(CLANG) --target=riscv32 -fuse-ld=$(LLVM)/bin/ld.lld -nostdlib -static -Wl,-T,app.lds -o cm htif_epic.o core_portme.o cvt.o ee_printf.o core_list_join.o core_main.o core_matrix.o core_state.o core_util.o -Wl,-pie
 
 cm.h: cm
 	xxd -i cm cm.h

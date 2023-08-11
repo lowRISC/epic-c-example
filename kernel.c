@@ -29,21 +29,9 @@ int main() {
         return 1;
     }
 
-    // Get relocation data from the ELF file. We could call rela_section
-    // multiple times to get the various relocation sections but here we
-    // assume that only one relocation section is needed (.rela.data).
-    rela_section_info rela_info = rela_section(elf_data, 0);
-    if (rela_info.offset == 0) {
-        print("Failed to find relocation section\n");
-        return 1;
-    }
-
-    // Put the relocation data in the format expected by the libtock-c crt0.
-    struct reldata rel_data = {rela_info.size, elf_data + rela_info.offset};
-
     // Use loader adapted from libtock-c crt0 to load the app from the simulated
     // Flash and relocate it.
-    load_from_flash(flash_addr, sram_addr, &rel_data);
+    load_from_flash(flash_addr, sram_addr);
 
     // Set the GP register (the PIC base) to the app's SRAM base address.
     // This is needed every time control is transfered to a different
