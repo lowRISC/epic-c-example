@@ -87,29 +87,6 @@ SECTIONS
     . = ALIGN(0x1000);
     _etext = .;
 
-    .stack :
-    {
-        /* elf2tab requires that the `_SRAM_ORIGIN` symbol be present to
-		 * mark the first address in the SRAM memory. Since ELF files do
-		 * not really need to specify this address as they only care about
-		 * loading into flash, we need to manually mark this address for
-		 * elf2tab. elf2tab will use it to add a fixed address header in the
-		 * TBF header if needed.
-		 */
-	    _sram_origin = .;
-
-        /* Be conservative about our alignment for the stack. Different
-         * architectures require different values (8 for ARM, 16 for RISC-V),
-         * so we choose the largest value. In practice, this likely will not
-         * matter since the start of SRAM is unlikely to be at a very peculiar
-         * address.
-         */
-        . = ALIGN(16);
-        _stack = .;
-        . = _stack + STACK_SIZE;
-        . = ALIGN(16);
-    } > SRAM
-
     . = ALIGN(2048);
     .data ALIGN(2048):
     {
