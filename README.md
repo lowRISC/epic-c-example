@@ -12,9 +12,9 @@ This repository showcases how to use the work-in-progress ePIC toolchain impleme
 The example runs in spike (riscv-isa-sim) and simulates a system with both SRAM and Flash memory. The kernel image embeds the ELF files it will load at arbitrary addresses during system execution. The steps to load an app are:
 
 - First the kernel simulates programming the Flash memory with the contents of the app that would be programmed into Flash in an actual embedded system.
-- Then a relocating loader, adapted from libtock-c crt0, loads the app from the simulated Flash into the simulated SRAM and relocates it. The relocation process includes adjusting the Global Offset Table (GOT) and applying simple relocations to the data section.
+- Then a relocating loader, adapted from libtock-c crt0, loads the app from the simulated Flash into the simulated SRAM and relocates it. The relocation process applies simple relocations (`R_RISCV_32` or `R_RISCV_64`) to the data segment, updating statically initialized pointers, vtables, and similar.
 - The GP register (the PIC base) is set to point to the app's SRAM base address.
-- Control is transferred to the just loaded app and it starts running.
+- Control is transferred to the just-loaded app and it starts running.
 
 ## Building and Running
 
