@@ -9,3 +9,4 @@ void *memcpy(void *dest, const void *src, size_t n);
 int strcmp(const char *s1, const char *s2);
 
 void print(const char *s);
+void print_hex(size_t x);

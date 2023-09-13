@@ -35,3 +35,12 @@ static unsigned strlen(const char* str) {
 void print(const char *s) {
     syscall(SYS_write, 0, (uintptr_t)s, (uintptr_t)strlen(s), 0, 0, 0, 0);
 }
+
+void print_hex(size_t x) {
+    for(int i = 7; i >= 0; i--) {
+        size_t digit = x >> (4 * i);
+        char buf[2] = {0, 0};
+        buf[0] = "0123456789ABCDEF"[digit & 0xF];
+        print(buf);
+    }
+}

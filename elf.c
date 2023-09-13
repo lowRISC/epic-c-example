@@ -4,6 +4,7 @@
 
 #include <stddef.h>
 #include <stdint.h>
+#include "addrs.h"
 #include "elf.h"
 #include "util.h"
 
@@ -41,32 +42,6 @@ typedef struct {
     uint16_t e_shstrndx;
 } Elf64_Ehdr;
 
-typedef struct {
-    uint32_t sh_name;
-    uint32_t sh_type;
-    uint32_t sh_flags;
-    uint32_t sh_addr;
-    uint32_t sh_offset;
-    uint32_t sh_size;
-    uint32_t sh_link;
-    uint32_t sh_info;
-    uint32_t sh_addralign;
-    uint32_t sh_entsize;
-} Elf32_Shdr;
-
-typedef struct {
-    uint32_t sh_name;
-    uint32_t sh_type;
-    uint64_t sh_flags;
-    uint64_t sh_addr;
-    uint64_t sh_offset;
-    uint64_t sh_size;
-    uint32_t sh_link;
-    uint32_t sh_info;
-    uint64_t sh_addralign;
-    uint64_t sh_entsize;
-} Elf64_Shdr;
-
 typedef struct
 {
     uint32_t p_type;
@@ -90,28 +65,12 @@ typedef struct {
     uint64_t p_align;
 } Elf64_Phdr;
 
-typedef struct {
-    uint32_t r_offset;
-    uint32_t r_info;
-    int32_t  r_addend;
-} Elf32_Rela;
-
-typedef struct {
-    uint64_t r_offset;
-    uint64_t r_info;
-    int64_t  r_addend;
-} Elf64_Rela;
-
 #if __riscv_xlen == 64
 #   define Elf_Ehdr Elf64_Ehdr
-#   define Elf_Shdr Elf64_Shdr
 #   define Elf_Phdr Elf64_Phdr
-#   define Elf_Rela Elf64_Rela
 #else
 #   define Elf_Ehdr Elf32_Ehdr
-#   define Elf_Shdr Elf32_Shdr
 #   define Elf_Phdr Elf32_Phdr
-#   define Elf_Rela Elf32_Rela
 #endif
 
 #define PT_LOAD 1
@@ -142,10 +101,10 @@ size_t program_flash_with_elf(const void *data, size_t flash_offset) {
     int ph_num = eh->e_ph_num;
     const Elf_Phdr *ph = data + eh->e_phoff;
 
-    for(int i = 0; i < ph_num-1; i++) {
-        if(ph[i].p_type != PT_LOAD || ph[i].p_memsz == 0)
+    for (int i = 0; i < ph_num; i++) {
+        if (ph[i].p_type != PT_LOAD || ph[i].p_memsz == 0)
             continue;
-        if((ph[i].p_paddr & SENTINEL) == 0)
+        if (!is_flash(ph[i].p_paddr))
             continue;
 
         // Load data into simulated Flash segment

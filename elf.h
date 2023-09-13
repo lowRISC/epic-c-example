@@ -5,6 +5,4 @@
 #include <stddef.h>
 #include <stdint.h>
 
-#define SENTINEL 0x80000000
-
 size_t program_flash_with_elf(const void *data, size_t flash_offset);

@@ -1,6 +1,6 @@
 OUTPUT_ARCH( "riscv" )
 
-ENTRY( main )
+ENTRY( _start )
 
 PROG_LENGTH = 0x00040000; /* 448 KB */
 RAM_LENGTH  = 0x00010000; /* 64 KB */
@@ -29,35 +29,29 @@ SECTIONS
          * Populate the header expected by `crt0`:
          *
          *  struct hdr {
-         *    uint32_t data_sym_start;
-         *    uint32_t data_start;
-         *    uint32_t data_size;
-         *    uint32_t bss_start;
-         *    uint32_t bss_size;
-         *    uint32_t reldata_start;
-         *    uint32_t stack_size;
+         *    size_t data_load_start;
+         *    size_t data_start;
+         *    size_t data_size;
+         *    size_t bss_start;
+         *    size_t bss_size;
+         *    size_t rela_dyn_start;
+         *    size_t rela_dyn_length;
          *  };
          */
-        /* Offset of data symbols in flash from the start of the application
-         * binary. */
-        LONG(LOADADDR(.data) - ORIGIN(FLASH));
-        /* Offset of where the data section will be placed in memory from the
-         * beginning of the app's assigned memory. */
-        LONG(_fdata - ORIGIN(SRAM));
-        /* Size of data section. */
+        /* Address of data in flash */
+        LONG(LOADADDR(.data));
+        /* Address of data section */
+        LONG(ADDR(.data));
+        /* Size of data section */
         LONG(SIZEOF(.data));
-        /* Offset of where the BSS section will be placed in memory from the
-         * beginning of the app's assigned memory. */
-        LONG(_fbss - ORIGIN(SRAM));
+        /* Address of BSS section */
+        LONG(ADDR(.bss));
         /* Size of BSS section */
         LONG(SIZEOF(.bss));
-        /* Address offset of .rela.dyn section */
-        LONG(LOADADDR(.rela.dyn) - ORIGIN(FLASH));
-        /* Size of .rela.dyn section */
-        LONG(SIZEOF(.rela.dyn));
-        /* The size of the stack requested by this application */
-        LONG(STACK_SIZE);
-        LONG(128);
+        /* Address of .rela.dyn section */
+        LONG(LOADADDR(.rela.dyn));
+        /* Number of entries in .rela.dyn section */
+        LONG(SIZEOF(.rela.dyn) / (4+4+4));
     } > FLASH =0xFF
 
     .rela.dyn :
@@ -84,44 +78,35 @@ SECTIONS
         *(.gnu.linkonce.r.*)
     } > FLASH
 
-    . = ALIGN(0x1000);
     _etext = .;
 
-    . = ALIGN(2048);
-    .data ALIGN(2048):
+    .data ALIGN(8):
     {
-        _fdata = .;
         *(.data)
         *(.data.*)
         *(.sdata*)
         *(.srodata*)
         *(.gnu.linkonce.d.*)
         *(.comment)
+        . = ALIGN(4);
     } > SRAM AT > FLASH
 
-    . = ALIGN(16);
     _edata = .;
 
-    /* Start of uninitialized data segment */
-    _fbss = .;
-
-    /* sbss: Uninitialized writeable small data section */
-
     /* bss: Uninitialized writeable data section */
-    _bss_start = .;
-    .bss :
+    .bss ALIGN(8):
     {
         *(.bss)
         *(.bss.*)
         *(.sbss*)
         *(.gnu.linkonce.b.*)
         *(COMMON)
+        . = ALIGN(4);
     } > SRAM
 
     .endflash :
     {
     } > FLASH
 
-    . = ALIGN(0x1000);
     _end = .;
 }
