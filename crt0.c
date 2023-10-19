@@ -13,7 +13,7 @@ struct hdr {
     size_t bss_start;
     size_t bss_size;
     size_t rela_dyn_start;
-    size_t rela_dyn_length;
+    size_t rela_dyn_size;
 };
 
 typedef struct {
@@ -26,8 +26,8 @@ void _start(size_t app_start, size_t flash_offset, size_t mem_offset) {
     struct hdr* hdr = (struct hdr*)(app_start);
 
     // Load statically initialized data into memory.
-    void* data_start      = (void*)(hdr->data_start + mem_offset);
-    void* data_load_start = (void*)(hdr->data_load_start + flash_offset);
+    void *data_start      = (void*)(hdr->data_start + mem_offset);
+    void *data_load_start = (void*)(hdr->data_load_start + flash_offset);
     memcpy(data_start, data_load_start, hdr->data_size);
 
     // Zero BSS segment.
@@ -35,12 +35,13 @@ void _start(size_t app_start, size_t flash_offset, size_t mem_offset) {
     memset(bss_start, 0, hdr->bss_size);
 
     // Apply relocations (to fix statically initialized pointers).
-    Elf_Rela *rel_data = (Elf_Rela*)(hdr->rela_dyn_start + flash_offset);
-    for (size_t i = 0; i < (hdr->rela_dyn_length); i++) {
+    size_t rel_data = (size_t)(hdr->rela_dyn_start + flash_offset);
+    for (size_t i = 0; i < (hdr->rela_dyn_size); i += sizeof(Elf_Rela)) {
         // The entries are offsets from the beginning of the app's memory region.
         // First, we get a pointer to the location of the address we need to fix.
-        size_t* target = (size_t*)(rel_data[i].r_offset + mem_offset);
-        size_t addend = rel_data[i].r_addend;
+        Elf_Rela *rel_data_entry = (Elf_Rela *)(rel_data + i);
+        size_t *target = (size_t*)(rel_data_entry->r_offset + mem_offset);
+        size_t addend = rel_data_entry->r_addend;
         if (is_flash(addend)) {
             // Relocate pointers to flash memory by adding the flash offset
             *target = addend + flash_offset;

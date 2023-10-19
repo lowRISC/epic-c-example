@@ -32,9 +32,9 @@ kernel: $(CLANG) Makefile64 kernel64.lds init.S kernel.c cm.h htif.c htif.h elf.
 coremark:
 	git clone https://github.com/eembc/coremark.git
 
-cm: $(CLANG) Makefile64 coremark app64.lds htif.c htif.h addrs.h crt0.c coremark-port/core_portme.c coremark-port/core_portme.h coremark-port/cvt.c coremark-port/ee_printf.c coremark/core_list_join.c coremark/core_main.c coremark/core_matrix.c coremark/core_state.c coremark/core_util.c
+cm: $(CLANG) Makefile64 coremark app64.lds htif.c htif.h addrs.h crt0.S coremark-port/core_portme.c coremark-port/core_portme.h coremark-port/cvt.c coremark-port/ee_printf.c coremark/core_list_join.c coremark/core_main.c coremark/core_matrix.c coremark/core_state.c coremark/core_util.c
 	$(CLANG) $(CM_CFLAGS) -c htif.c -o htif_epic.o
-	$(CLANG) $(CM_CFLAGS) -c crt0.c -o crt0.o
+	$(CLANG) $(CM_CFLAGS) -c crt0.S -o crt0.o
 	$(CLANG) $(CM_CFLAGS) -c coremark-port/core_portme.c
 	$(CLANG) $(CM_CFLAGS) -c coremark-port/cvt.c
 	$(CLANG) $(CM_CFLAGS) -c coremark-port/ee_printf.c

@@ -35,7 +35,7 @@ SECTIONS
          *    size_t bss_start;
          *    size_t bss_size;
          *    size_t rela_dyn_start;
-         *    size_t rela_dyn_length;
+         *    size_t rela_dyn_size;
          *  };
          */
         /* Address of data in flash */
@@ -50,8 +50,8 @@ SECTIONS
         LONG(SIZEOF(.bss));
         /* Address of .rela.dyn section */
         LONG(LOADADDR(.rela.dyn));
-        /* Number of entries in .rela.dyn section */
-        LONG(SIZEOF(.rela.dyn) / (4+4+4));
+        /* Size of .rela.dyn section */
+        LONG(SIZEOF(.rela.dyn));
     } > FLASH =0xFF
 
     .rela.dyn :
