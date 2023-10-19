@@ -59,9 +59,8 @@ SECTIONS
         *(.rela.dyn)
     } > FLASH
 
-    .text :
+    .text ALIGN(4):
     {
-        . = ALIGN(0x10);
         _ftext = .;
         *(.text.init)
         *(.text)
@@ -69,9 +68,8 @@ SECTIONS
         *(.gnu.linkonce.t.*)
     } > FLASH
 
-    .rodata :
+    .rodata ALIGN(8):
     {
-        . = ALIGN(0x10);
         *(.rdata)
         *(.rodata)
         *(.rodata.*)
