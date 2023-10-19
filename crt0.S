@@ -46,13 +46,10 @@ _start:
     LOAD a2, hdr_bss_size_offset(s0)        // a2 <- hdr->bss_size
     call memset                             // memset(bss_start + mem_offset, 0, hdr->bss_size);
 
-    li t0, 0                                // t0 <- i = 0
-    LOAD t1, hdr_rela_dyn_size_offset(s0)   // t1 <- hdr->rela_dyn_size
-    LOAD t2, hdr_rela_dyn_start_offset(s0)  // t2 <- hdr->rela_dyn_start
-    add t2, t2, s1                          // t2 <- hdr->rela_dyn_start + flash_offset
+    la t0, __rela_dyn_end
+    la t4, __rela_dyn_start
     li t3, flash_mem_start
 1:
-    add t4, t2, t0                          // t4 <- rel_data_entry = hdr->rela_dyn_start + flash_offset + i
     LOAD t5, 0*xsize(t4)                    // t5 <- rel_data_entry->r_offset
     add t5, t5, s2                          // t5 <- rel_data_entry->r_offset + mem_offset
     LOAD t6, 2*xsize(t4)                    // t6 <- rel_data_entry->r_addend
@@ -63,8 +60,8 @@ _start:
     add t6, t6, s1                          // t6 <- rel_data_entry->r_addend + flash_offset
 3:
     STORE t6, 0(t5)
-    addi t0, t0, rela_entry_size
-    bltu t0, t1, 1b
+    addi t4, t4, rela_entry_size
+    bltu t4, t0, 1b
 
     mv a2, s2
     mv a1, s1

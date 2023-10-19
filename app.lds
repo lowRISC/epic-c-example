@@ -56,7 +56,9 @@ SECTIONS
 
     .rela.dyn :
     {
+        __rela_dyn_start = .;
         *(.rela.dyn)
+        __rela_dyn_end = .;
     } > FLASH
 
     .text ALIGN(4):
